@@ -1,0 +1,57 @@
+@keyframes rotate0to90{
+    from{transform: rotate(0);}
+    to{transform: rotate(90deg);}
+}
+@keyframes rotate90to0{
+    from{transform: rotate(90deg);}
+    to{transform: rotate(0);}
+}
+@keyframes close-morebar{
+    from{left: 0; box-shadow: 0;}
+    to{left: -300px; box-shadow: 0 0 20px -8px #666666;}
+}
+@keyframes show-morebar{
+    from{left: -300px; box-shadow: 0 0 20px -8px #666666;}
+    to{left: 0; box-shadow: 0;}
+}
+@keyframes close-write{
+    from{left: 100px;}
+    to{left: 100vw; }
+}
+@keyframes show-write{
+    from{left: 100vw;}
+    to{left: 100px;}
+}
+@keyframes show-morebar-mask{
+    from{opacity: 0;}
+    to{opacity: 0.6;}
+}
+@keyframes close-morebar-mask{
+    from{opacity: 0.6;}
+    to{opacity: 0;}
+}
+@keyframes show-ani{
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
+@keyframes close-ani{
+    from{opacity: 1;}
+    to{opacity: 0;}
+}
+@keyframes long-ani{
+    from{width: 0;}
+    to{width: 100%;}
+}
+@keyframes short-ani{
+    from{width: 100%;}
+    to{width: 0;}
+}
+
+@keyframes toReg{
+    from{background-image: url("../assets/login_head.png");}
+    to{background-image: url("../assets/reg_head.png");}
+}
+@keyframes toLogin{
+    from{background-image: url("../assets/reg_head.png");}
+    to{background-image: url("../assets/login_head.png");}
+}
