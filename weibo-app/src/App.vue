@@ -33,5 +33,13 @@ i.back {
   padding: 15px;
   margin-left: -15px;
 }
-
+.notice-toast{
+  width: 30vw !important;
+}
+.notice-toast>span{
+  font-size: 1rem !important;
+}
+.mint-indicator-wrapper{
+  z-index: 999 !important;
+}
 </style>

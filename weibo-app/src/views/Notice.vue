@@ -2,7 +2,7 @@
   <div id="notice">
     <div class="header">
       <div class="title">
-        <router-link :to="{name:'Home'}">
+        <router-link to="/Home">
           <i class="iconfont icon-icon_left back"></i>
         </router-link>
         <span>我的通知</span>

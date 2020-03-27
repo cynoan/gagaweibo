@@ -1,8 +1,8 @@
 <template>
   <div id="details-cont">
     <relay :relays="relays"></relay>
-    <comment active :comms="comms"></comment>
-    <likes></likes>
+    <comment active :comms="comms" @commComm="commComm"></comment>
+    <likes :likes="likes"></likes>
   </div>
 </template>
 <script>
@@ -15,8 +15,10 @@ export default {
       active:"comment"
     }
   },
-  created(){
-
+  methods: {
+    commComm(data){
+      this.$emit("commComm",data);
+    }
   },
   components: {
     comment,
@@ -27,6 +29,7 @@ export default {
     selected:{ default: "" },
     comms:{ default: ""},
     relays:{ default: ""},
+    likes:{ default: ""},
   },
   watch:{
     selected:function(newVal,oldVal){

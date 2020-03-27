@@ -2,7 +2,7 @@
   <div id="mlist">
     <ul>
       <li v-for="(msg,i) of msgs" :key="i" class="msg-item">
-        <div :style="`background:url(${require('../assets/'+msg.avatar)})`" class="user-avatar"></div>
+        <div :style="`background:url(http://q7fplcgtx.bkt.clouddn.com/image/${msg.avatar})`" class="user-avatar"></div>
         <div class="msg-right">
           <span class="user-name">{{msg.name}}</span>
           <p class="msg-txt">{{msg.txt}}</p>

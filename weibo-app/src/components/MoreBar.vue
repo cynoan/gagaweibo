@@ -1,10 +1,10 @@
 <template>
   <div id="morebar">
     <div id="myself">
-      <img src="../assets/avatar.jpg" id="user_avatar" />
-      <span id="user_name">Cynoan</span>
+      <img :src="$store.state.infos.avatar" id="user_avatar" />
+      <span id="user_name">{{$store.state.infos.nickname}}</span>
       <div>
-        <p id="intro">欢迎关注/苍南人/不是专门发摄影的账号/喜欢摄影后期剪辑/MADer/会修手机/没钱玩数码了</p>
+        <p id="intro">{{$store.state.infos.intro}}</p>
       </div>
     </div>
     <ul>
@@ -13,6 +13,12 @@
           <i :class="'iconfont '+item.pic"></i>
           <span>{{item.title}}</span>
         </router-link>
+      </li>
+      <li>
+        <a class="link" @click="logout()">
+          <i class="iconfont icon-dengchu-box-kuai"></i>
+          <span>退出账户</span>
+        </a>
       </li>
     </ul>
   </div>
@@ -29,13 +35,24 @@ export default {
           to: "/MyCommsAndLikes"
         },
         { pic: "icon-icon_star_fill", title: "收藏", to: "/MyFavorites" },
-        // { pic: "icon-icon_invite_fill", title: "草稿箱", to: "/" },
-        { pic: "icon-icon_work_fill", title: "设置", to: "/" },
-        { pic: "icon-dengchu-box-kuai", title: "退出账户", to: "/" }
+        { pic: "icon-icon_invite_fill", title: "草稿箱", to: "/Home" },
+        { pic: "icon-icon_work_fill", title: "设置", to: "/Home" },
       ]
     };
   },
   methods: {
+    logout(){
+      this.$messagebox.confirm("确认退出账号？").then(()=>{
+        console.log("退出登录");
+        window.localStorage.removeItem("user");
+        this.$store.commit("logout");
+
+        this.$router.push("/");
+        
+      }).catch(()=>{
+        console.log("取消操作");
+      })
+    },
     closeMask() {
       this.obj.more.style.transform = "rotate(0)";
       this.obj.more.style.animation = "";
@@ -68,7 +85,7 @@ export default {
   flex-flow: column nowrap;
   width: 300px;
   height: 213px;
-  background: linear-gradient(150deg, #59d4f7 20%, #315ba8 100%);
+  background: linear-gradient(150deg, #b6e3f0 20%, #656f83 100%);
   text-align: center;
 }
 #user_avatar {

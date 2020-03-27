@@ -3,7 +3,7 @@
       <div v-for="(item,i) of allPics" :key="i" class="pic-item">
         <div class="date">{{(new Date(item[0].date)).getFullYear()<(new Date()).getFullYear()?(new Date(item[0].date)).getFullYear()+"年"+((new Date(item[0].date)).getMonth()+1)+"月":(new Date(item[0].date)).getMonth()+1+"月"}}</div>
         <div class="pics">
-          <div v-for="(pic,j) of item" :key="j" :style="`background:url(${require('../assets/'+pic.imgUrl)})`" class="pic"></div>
+          <div v-for="(pic,j) of item" :key="j" :style="`background:url(http://q7fplcgtx.bkt.clouddn.com/image/${pic.imgUrl})`" class="pic"></div>
         </div>
       </div>
   </div>

@@ -6,14 +6,20 @@
     </div>
     <gaga-body :gaga="gaga"></gaga-body>
     <div class="tabs" @click="tabClick($event)">
-      <span class="tab" id="tab-relay">转发({{gaga.relay}})</span>
-      <span class="tab" id="tab-comment" selected>评论({{gaga.comment}})</span>
-      <span class="tab" id="tab-likes">赞({{gaga.like}})</span>
+      <span class="tab" id="tab-relay">转发({{relays.length}})</span>
+      <span class="tab" id="tab-comment" selected>评论({{comms.length}})</span>
+      <span class="tab" id="tab-likes">赞({{likes.length}})</span>
       <div>
         <div class="selbar" :sel="this.selected"></div>
       </div>
     </div>
-    <details-cont :selected="selected" :comms="comms" :relays="relays"></details-cont>
+    <details-cont
+      :selected="selected"
+      :comms="comms"
+      :relays="relays"
+      :likes="likes"
+      @commComm="commComm"
+    ></details-cont>
     <div class="footer">
       <i class="iconfont icon-xie comm" @click="showWrite">
         <span>说点什么吧……</span>
@@ -22,39 +28,97 @@
       <i class="iconfont icon-zhuanhuan relay"></i>
     </div>
     <div id="mask" @click="closeWrite"></div>
-    <write-comm></write-comm>
+    <write-comm :gid="gaga.gid" @send="isSend" :originComm="originComm" :isCommGaga="isCommGaga"></write-comm>
   </div>
 </template>
 <script>
 import gagaBody from "../components/GagaBody";
 import detailsCont from "../components/DetailsCont";
 import writeComm from "../components/WriteComm";
-import gagaData from "../json/gaga.json";
 export default {
   data() {
     return {
       selected: "comment",
       gaga: "",
-      comms: gagaData.comms,
-      relays: gagaData.relays
+      comms: " ",
+      relays: " ",
+      likes: " ",
+      fromName: "",
+      originComm: "",
+      isCommGaga:""
     };
   },
   created() {
-    this.gaga = this.$route.params;
+    this.$store.commit("regetUser");
+    if (this.$route.params.gid == undefined) {
+      this.gaga = JSON.parse(window.sessionStorage.getItem("nowGaga"));
+    } else {
+      this.gaga = this.$route.params;
+      window.sessionStorage.setItem("nowGaga", JSON.stringify(this.gaga));
+    }
+    this.getDetails();
   },
   methods: {
+    commComm(comm) {
+      this.showWrite(comm);
+    },
+    getDetails() {
+      this.axios
+        .get("/user/getdetails", { params: { gid: this.gaga.gid } })
+        .then(res => {
+          this.comms = res.data.comms;
+          this.relays = res.data.relays;
+          this.likes = res.data.likes;
+          return true;
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    },
+    getComms() {
+      this.axios
+        .get("/user/getcomms", { params: { gid: this.gaga.gid } })
+        .then(res => {
+          this.comms = res.data;
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    },
+    isSend(data) {
+      if (data.code == 1)
+        this.$toast({
+          message: data.msg,
+          className: "notice-toast"
+        });
+      this.closeWrite();
+      this.getComms();
+    },
     back() {
-      this.$router.go(-1);
+      if (this.gaga.from == "Home") {
+        this.$router.push("/Home");
+      } else {
+        this.$router.go(-1);
+      }
     },
     showWrite() {
+      if (arguments[0].cid) {
+        document.querySelector("p#title").innerHTML = `@${arguments[0].nickname}：${arguments[0].content}`;
+        this.originComm = arguments[0];
+        this.isCommGaga = false;
+      } else {
+        this.isCommGaga = true;
+      }
       var writeArea = document.getElementById("write-comm");
       var mask = document.getElementById("mask");
       var footer = document.querySelector("div.footer");
       footer.style.transform = "translateY(60px)";
       mask.style.cssText = "display:block; animation:show-ani 0.3s";
       writeArea.style.transform = "translateY(-243px)";
+      document.querySelector("textarea#comm-txt").focus();
     },
     closeWrite() {
+      document.querySelector("p#title").innerHTML = "发评论";
       var writeArea = document.getElementById("write-comm");
       var mask = document.getElementById("mask");
       var footer = document.querySelector("div.footer");

@@ -11,7 +11,7 @@
         :{{gaga.commContent}}
       </p>
       <div>
-        <div class="origin-pic" :style="`background-image:url(${require('../assets/'+ gaga.originAvatar)})`"></div>
+        <div class="origin-pic" :style="`background-image:url(http://q7fplcgtx.bkt.clouddn.com/image/${gaga.originAvatar})`"></div>
         <div class="origin-content">
           <span>@{{gaga.originAuthor}}</span>
           <p v-html="gaga.originContent"></p>
@@ -19,7 +19,7 @@
       </div>
     </div>
     <div id="origin" class="notComm" v-else>
-      <div class="origin-pic" :style="`background-image:url(${require('../assets/' + gaga.originAvatar)})`"></div>
+      <div class="origin-pic" :style="`background-image:url(http://q7fplcgtx.bkt.clouddn.com/image/${gaga.originAvatar})`"></div>
       <div class="origin-content">
         <span>@{{gaga.originAuthor}}</span>
         <p v-html="gaga.originContent"></p>

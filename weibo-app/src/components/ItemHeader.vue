@@ -1,13 +1,13 @@
 <template>
   <div id="item-header">
-    <img :src="require(`../assets/${gaga.avatar}`)" class="user-avatar" />
+    <img :src="gaga.avatar" class="user-avatar" />
     <div class="head-title">
       <div>
-        <span class="user-name">{{gaga.uname}}</span>
+        <span class="user-name">{{gaga.nickname}}</span>
         <i class="iconfont icon-icon_copyto" v-if="isCommMe">&nbsp;回复</i>
         <i class="iconfont icon-icon_delete_fill" v-if="isMyComms">&nbsp;删除</i>
         <div class="like-comm" v-if="isComment">
-          <span class="like-count">{{gaga.like}}</span>
+          <span class="like-count">{{gaga.likes}}</span>
           <i class="iconfont icon-xihuan"></i>
         </div>
       </div>

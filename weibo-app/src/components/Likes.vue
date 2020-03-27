@@ -1,19 +1,23 @@
 <template>
   <div id="likes">
-    <div class="like-item" v-for="i of 20" :key="i">
-      <img src="../assets/2.jpg" class="user-avatar" />
+    <div class="like-item" v-for="(like,i) of likes" :key="i">
+      <img :src="like.avatar" class="user-avatar" />
       <div>
-        <span class="user-name">Bobi</span>
+        <span class="user-name">{{like.nickname}}</span>
         <span
           class="user-intro"
-        >Lorem ipsum dolor sit amet consectetur.Lorem ipsum dolor sit amet consectetur.</span>
-        <span class="user-fans">粉丝 : 358</span>
+        >{{like.intro}}</span>
+        <span class="user-fans">粉丝 : {{like.fans}}</span>
       </div>
     </div>
   </div>
 </template>
 <script>
-export default {};
+export default {
+  props:{
+    likes:{ default:"" }
+  }
+};
 </script>
 <style scoped>
 #likes{
@@ -22,7 +26,7 @@ export default {};
 .like-item {
   box-sizing: border-box;
   display: flex;
-  height: 50px;
+  height: 60px;
   padding: 0 15px;
   width: 100vw;
   margin: 15px 0 17px;
@@ -33,7 +37,7 @@ export default {};
 .like-item > div {
   box-sizing: border-box;
   display: flex;
-  height: 50px;
+  height: 60px;
   width: 100%;
   margin-left: 10px;
   flex-direction: column;
@@ -45,8 +49,8 @@ export default {};
   flex: none;
   box-sizing: border-box;
   border: 1px solid #aaa;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
 }
 .user-name {

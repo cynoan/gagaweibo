@@ -1,27 +1,81 @@
 <template>
   <div id="write-comm">
-      <p>发评论</p>
-      <textarea id="comm-txt" placeholder="说点什么吧..."></textarea>
-      <div>
-        <input type="checkbox" id="isRelay" />
-        <label for="isRelay">
-          <i>
-            <i></i>
-          </i>
-          <span>同时转发</span>
-        </label>
+    <p id="title">发评论</p>
+    <textarea id="comm-txt" placeholder="说点什么吧..." v-model="content"></textarea>
+    <div>
+      <input type="checkbox" id="isRelay" />
+      <label for="isRelay">
+        <i>
+          <i></i>
+        </i>
+        <span>同时转发</span>
+      </label>
+    </div>
+    <div class="footer">
+      <div class="footer_left">
+        <i class="iconfont icon-icon_camera_fill" id="photo"></i>
+        <i class="iconfont icon-icon_at" id="at"></i>
       </div>
-      <div class="footer">
-        <div class="footer_left">
-          <i class="iconfont icon-icon_camera_fill" id="photo"></i>
-          <i class="iconfont icon-icon_at" id="at"></i>
-        </div>
-        <i class="iconfont icon-icon_send" id="send"></i>
-      </div>
+      <i class="iconfont icon-icon_send" id="send" @click="newComm()"></i>
+    </div>
   </div>
 </template>
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      content: "",
+      oriComm: null
+    };
+  },
+  methods: {
+    newComm() {
+      let url = "/upload/newcomm";
+      let data = "";
+      // let uid = this.$store
+      if (this.isCommGaga) {
+        data = this.qs.stringify({
+          uid: this.$store.state.uid,
+          gid: this.gid,
+          content: this.content,
+          date: new Date().getTime()
+        });
+      } else {
+        data = this.qs.stringify({
+          uid: this.$store.state.uid,
+          gid: this.gid,
+          ocid: this.oriComm.cid,
+          content: this.content,
+          date: new Date().getTime()
+        });
+      }
+      this.axios
+        .post(url, data, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+          }
+        })
+        .then(res => {
+          this.content = "";
+          this.$emit("send", res.data);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+        this.oriComm = this.isCommGaga ? null : this.originComm;
+    }
+  },
+  props: {
+    gid: { default: null },
+    originComm: { default: null },
+    isCommGaga: { default:null }
+  },
+  watch: {
+    originComm() {
+      this.oriComm = this.originComm;
+    }
+  }
+};
 </script>
 <style scoped>
 #write-comm {

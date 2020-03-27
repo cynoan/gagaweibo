@@ -1,6 +1,6 @@
 <template>
   <div id="tab-container" :active="this.selected">
-    <gaga-list active :gagas="gagas"></gaga-list>
+    <gaga-list active :gagas="gagas" @relay="relayIt"></gaga-list>
     <message></message>
     <person></person>
   </div>
@@ -9,19 +9,21 @@
 import gagaList from "../components/GagaList";
 import message from "../components/Message";
 import person from "../components/Person";
-import gagaData from "../json/gaga.json";
 export default {
-  data() {
-    return {
-      gagas: gagaData.gagas
-    };
-  },
   components: {
     gagaList,
     message,
-    person
+    person,
+    glistTop: "",
+    gmsgTop: "",
+    gpersonTop: ""
   },
-  props: ["selected"],
+  props: ["selected", "gagas"],
+  methods: {
+    relayIt(data){
+      this.$emit("relay",data);
+    },
+  },
 };
 </script>
 <style scoped>
@@ -65,33 +67,33 @@ export default {
   display: none;
 }
 
-#tab-container[active="list"]>#glist{
-  left:0;
+#tab-container[active="list"] > #glist {
+  left: 0;
 }
-#tab-container[active="list"]>#gmsg{
+#tab-container[active="list"] > #gmsg {
   left: 100vw;
 }
-#tab-container[active="list"]>#gperson{
+#tab-container[active="list"] > #gperson {
   left: 200vw;
 }
 
-#tab-container[active="msg"]>#glist{
-  left:-100vw;
+#tab-container[active="msg"] > #glist {
+  left: -100vw;
 }
-#tab-container[active="msg"]>#gmsg{
+#tab-container[active="msg"] > #gmsg {
   left: 0;
 }
-#tab-container[active="msg"]>#gperson{
+#tab-container[active="msg"] > #gperson {
   left: 100vw;
 }
 
-#tab-container[active="person"]>#glist{
-  left:-200vw;
+#tab-container[active="person"] > #glist {
+  left: -200vw;
 }
-#tab-container[active="person"]>#gmsg{
+#tab-container[active="person"] > #gmsg {
   left: -100vw;
 }
-#tab-container[active="person"]>#gperson{
+#tab-container[active="person"] > #gperson {
   left: 0;
 }
 </style>

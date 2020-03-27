@@ -1,10 +1,10 @@
 <template>
   <div id="gperson">
-    <div class="back" :style="`background:url(${require('../assets/back.png')})`"></div>
+    <div class="back" style="background:url(http://q7fplcgtx.bkt.clouddn.com/image/back.png)"></div>
     <div class="personal">
-      <img src="../assets/avatar.jpg" class="user-avatar" />
-      <span class="user-name">Cynoan</span>
-      <p class="intro">欢迎关注/苍南人/不是专门发摄影的账号/喜欢摄影后期剪辑/MADer/会修手机/没钱玩数码了</p>
+      <img :src="$store.state.infos.avatar" class="user-avatar" />
+      <span class="user-name">{{$store.state.infos.nickname}}</span>
+      <p class="intro">{{$store.state.infos.intro}}</p>
       <p class="p-bottom">
         关注
         <span class="attention">313</span>
@@ -22,7 +22,7 @@
     </div>
     <div class="container">
       <gaga-list class="weibo" selected :gagas="mygagas"></gaga-list>
-      <photos class="photo" ></photos>
+      <photos class="photo"></photos>
     </div>
   </div>
 </template>
@@ -34,8 +34,30 @@ export default {
   data() {
     return {
       selected: "weibo",
-      mygagas: gagaData.mygagas
+      mygagas: ""
     };
+  },
+  created() {
+    this.axios
+      .post(
+        "/user/getmylist",
+        this.qs.stringify({
+          uid: this.$store.state.uid,
+          nickname: this.$store.state.infos.nickname,
+          avatar: this.$store.state.infos.avatar,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+          }
+        }
+      )
+      .then(res => {
+        this.mygagas = res.data;
+      })
+      .catch(err => {
+        console.error(err);
+      });
   },
   methods: {
     tabClick(e) {
@@ -43,10 +65,14 @@ export default {
       if (elem.nodeName == "SPAN") {
         if (elem.id != this.selected) {
           document.getElementById(this.selected).removeAttribute("selected");
-          document.querySelector(`.container>.${this.selected}`).removeAttribute("selected");
+          document
+            .querySelector(`.container>.${this.selected}`)
+            .removeAttribute("selected");
           this.selected = elem.id;
           document.getElementById(this.selected).setAttribute("selected", "");
-          document.querySelector(`.container>.${this.selected}`).setAttribute("selected", "");
+          document
+            .querySelector(`.container>.${this.selected}`)
+            .setAttribute("selected", "");
         }
       }
     }
@@ -58,16 +84,16 @@ export default {
 };
 </script>
 <style scoped>
-.container{
+.container {
   width: 100vw;
 }
 #glist,
-#gphoto{
+#gphoto {
   display: none;
   opacity: 0;
 }
 #glist[selected],
-#gphoto[selected]{
+#gphoto[selected] {
   display: block;
   opacity: 1;
 }

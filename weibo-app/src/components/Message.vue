@@ -78,7 +78,7 @@ ul > li:not(:first-child) {
 ul > li i {
   height: 50px;
   width: 50px;
-  background: linear-gradient(150deg, #59d4f7 20%, #315ba8 100%);
+  background: linear-gradient(150deg, #b6e3f0 20%, #656f83 100%);
   font-size: 28px;
   color: #fff;
   border-radius: 50%;

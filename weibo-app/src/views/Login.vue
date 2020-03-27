@@ -1,7 +1,7 @@
 <template>
   <div id="login-layout" @click="hideBtn($event)">
     <div id="header" ref="header">
-      <img src="../assets/logo1.png" class="logo" />
+      <img src="http://q7fplcgtx.bkt.clouddn.com/image/logo1.png" class="logo" />
       <div :class="`login-bottom login ${which ? 'show-in' : 'show-out'}`" v-show="which">
         <a>忘记密码</a>
         <span>|</span>
@@ -31,14 +31,20 @@
           />
           <i class="iconfont icon-chahao" id="clear-pwd" :show="show" @click="clearPwd"></i>
         </div>
-        <button ref="loginBtn" class="submit" :canLogin="canLogin" :disabled="!canLogin" @click="login()">
+        <button
+          ref="loginBtn"
+          class="submit"
+          :canLogin="canLogin"
+          :disabled="!canLogin"
+          @click="login()"
+        >
           <i class="iconfont icon-jichutubiao-XC-xiangyou"></i>
         </button>
       </div>
 
       <div id="reg" v-show="!which" :class="!which ? 'show-in' : 'show-out'">
         <div class="regDiv">
-          <span id="uname-msg" v-show="!unameok && unameok!=null">包含4~12位英文字母或数字</span>
+          <span class="uname-msg">{{unameMsg}}</span>
           <i class="iconfont icon-jinggao" v-if="!unameok && unameok!=null"></i>
           <i class="iconfont icon-zhengque" v-if="unameok"></i>
           <input
@@ -51,7 +57,7 @@
           />
         </div>
         <div class="regDiv">
-          <span id="upwd-msg" v-show="!upwdok && upwdok!=null">同时包含6~12位英文字母和数字</span>
+          <span class="upwd-msg">{{upwdMsg}}</span>
           <i class="iconfont icon-jinggao" v-if="!upwdok && upwdok!=null"></i>
           <i class="iconfont icon-zhengque" v-if="upwdok"></i>
           <input
@@ -64,7 +70,7 @@
           />
         </div>
         <div class="regDiv">
-          <span id="cpwd-msg" v-show="!cpwdok && cpwdok!=null">两次密码输入不一致</span>
+          <span class="cpwd-msg">{{cpwdMsg}}</span>
           <i class="iconfont icon-jinggao" v-if="!cpwdok && cpwdok!=null"></i>
           <i class="iconfont icon-zhengque" v-if="cpwdok"></i>
           <input
@@ -77,7 +83,7 @@
           />
         </div>
         <div class="regDiv">
-          <span id="phone-msg" v-show="!phoneok && phoneok!=null">手机号格式不正确</span>
+          <span class="phone-msg">{{phoneMsg}}</span>
           <i class="iconfont icon-jinggao" v-if="!phoneok && phoneok!=null"></i>
           <i class="iconfont icon-zhengque" v-if="phoneok"></i>
           <input
@@ -89,11 +95,18 @@
             :ok="phoneok"
           />
         </div>
-        <button ref="regBtn" class="submit" :canReg="canReg" :disabled="!canReg">
+        <button
+          ref="regBtn"
+          class="submit"
+          :canReg="canReg"
+          :disabled="!canReg"
+          @click="register()"
+        >
           <i class="iconfont icon-jichutubiao-XC-xiangyou"></i>
         </button>
       </div>
     </div>
+    <span id="debug-msg" ref="debug">debug-msg</span>
   </div>
 </template>
 <script>
@@ -121,10 +134,41 @@ export default {
       degFunc: null,
       fromFunc: null,
       toFunc: null,
-      which: true
+      which: true,
+      unameMsg: "",
+      upwdMsg: "",
+      cpwdMsg: "",
+      phoneMsg: "",
+      storage: ""
     };
   },
   created() {
+    if (
+      window.Storage &&
+      window.localStorage &&
+      window.localStorage instanceof Storage
+    ) {
+      // console.log("支持LocalStorage");
+      this.storage = window.localStorage;
+      var user = JSON.parse(this.storage.getItem("user"));
+      if (user) {
+        if (new Date().getTime() - user.time > 604800000) {
+          this.storage.removeItem("user");
+        } else {
+          console.log(user.uname, user.upwd)
+          this.$indicator.open({
+            text:"获取登录状态",
+            spinnerType:"triple-bounce"
+          });
+          setTimeout(() => {
+            this.$indicator.close();
+            this.login(user.uname, user.upwd);
+          }, 500);
+        }
+      }
+    } else {
+      console.log("不支持LocalStorage");
+    }
     this.degFunc = () => {
       this.btnBack.deg++;
     };
@@ -208,27 +252,65 @@ export default {
     },
     reguname() {
       var reg = /^[a-zA-Z0-9]{4,12}$/;
-      this.unameok = reg.test(this.reguname);
+      if (reg.test(this.reguname)) {
+        this.axios
+          .get("/user/checkuname", {
+            params: {
+              uname: this.reguname
+            }
+          })
+          .then(res => {
+            if (res.data.code == -1) {
+              this.unameok = false;
+              this.unameMsg = "用户名已存在";
+            } else {
+              this.unameok = true;
+              this.unameMsg = "用户名可以使用";
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          });
+        return;
+      } else {
+        this.unameok = false;
+        this.unameMsg = "包含4~12位英文字母或数字";
+      }
     },
     regupwd() {
       var reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,12}$/;
       this.upwdok = reg.test(this.regupwd);
+      if (this.upwdok) {
+        this.upwdMsg = "密码格式正确";
+      } else if (this.upwdok != null) {
+        this.upwdMsg = "同时包含6~12位英文字母和数字";
+      }
     },
     cpwd() {
       var str = `^${this.cpwd}$`;
       var reg = new RegExp(str);
       this.cpwdok =
         reg.test(this.regupwd) && this.regupwd != null && this.regupwd != "";
+      if (this.cpwdok) {
+        this.cpwdMsg = "密码输入一致";
+      } else if (this.cpwdok != null) {
+        this.cpwdMsg = "两次密码输入不一致";
+      }
     },
     phone() {
       var reg = /^1[3-9][0-9]{9}$/;
       this.phoneok = reg.test(this.phone);
+      if (this.phoneok) {
+        this.phoneMsg = "手机号格式正确";
+      } else if (this.phoneok != null) {
+        this.phoneMsg = "手机号格式不正确";
+      }
     }
   },
   methods: {
     toReg() {
       this.$refs.header.style.animation = "toReg 0.5s";
-      this.$refs.header.style.backgroundImage = `url(${require("../assets/reg_head.png")})`;
+      this.$refs.header.style.backgroundImage = "url(http://q7fplcgtx.bkt.clouddn.com/image/reg_head.jpg)";
       this.which = false;
       this.$refs.loguname.value = "";
       this.$refs.logupwd.value = "";
@@ -237,10 +319,11 @@ export default {
     },
     toLogin() {
       this.$refs.header.style.animation = "toLogin 0.5s";
-      this.$refs.header.style.backgroundImage = `url(${require("../assets/login_head.png")})`;
+      this.$refs.header.style.backgroundImage = "url(http://q7fplcgtx.bkt.clouddn.com/image/login_head.jpg)";
       this.reguname = this.regupwd = this.cpwd = this.phone = "";
       setTimeout(() => {
         this.unameok = this.upwdok = this.cpwdok = this.phoneok = null;
+        this.unameMsg = this.upwdMsg = this.cpwdMsg = this.phoneMsg = "";
       }, 0);
       this.which = true;
     },
@@ -271,27 +354,80 @@ export default {
         this.upwdType = "password";
       }
     },
-    login() {
-      this.axios.post(
-        "/user/login",
-        this.qs.stringify({
-          uname: this.loguname,
-          upwd: this.logupwd
-        }),
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    login($uname = this.loguname, $upwd = this.md5(this.logupwd)) {
+      this.$refs.debug.innerHTML = "Click login button";
+      this.axios
+        .post(
+          "/user/login",
+          this.qs.stringify({
+            uname: $uname,
+            upwd: $upwd
+          }),
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+            }
           }
-        }
-      )
-      .then(res => {
-        console.log(111);
-        this.$toast(res.data.msg);
-      })
-      .catch(err => {
-        console.log(err);
+        )
+        .then(res => {
+          this.$refs.debug.innerHTML = "Request success";
+          // console.log("uid:" + res.data.uid + "," + res.data.msg);
+          this.$toast({
+            message: res.data.msg,
+            className: "notice-toast"
+          });
+          if (res.data.code == 1) {
+
+            this.$router.push("/Home");
+
+            this.$store.commit("setUid", res.data.uid);
+            if (!this.storage.getItem("user")) {
+              this.storage.setItem("user",JSON.stringify({
+                  uid:res.data.uid,
+                  uname: $uname,
+                  upwd: $upwd,
+                  time: new Date().getTime()
+                })
+              );
+            }
+          }
+        })
+        .catch(err => {
+          this.$refs.debug.innerHTML = "Request failed";
+          console.log(err);
+        });
+    },
+    register() {
+      let url = "/user/reg";
+      let body = this.qs.stringify({
+        uname: this.reguname,
+        upwd: this.md5(this.regupwd),
+        phone: this.phone
       });
+      let options = {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
+      };
+      this.axios
+        .post(url, body, options)
+        .then(res => {
+          // console.log(res.data.msg);
+          if (res.data.code == 1) {
+            this.$toast({
+              message: res.data.msg,
+              className: "notice-toast"
+            });
+            this.toLogin();
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        });
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
   }
 };
 </script>
@@ -310,7 +446,7 @@ export default {
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
-  background-image: url("../assets/login_head.png");
+  background-image: url("http://q7fplcgtx.bkt.clouddn.com/image/login_head.jpg");
 }
 #header > .logo {
   position: absolute;
@@ -471,5 +607,10 @@ input[err] {
 }
 .show-out {
   animation: close-ani 1s;
+}
+#debug-msg{
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
 }
 </style>

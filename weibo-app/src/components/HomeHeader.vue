@@ -3,13 +3,13 @@
     <div class="header">
       <i class="iconfont icon-caidan-kuai" id="more" @click="showMore()"></i>
       <div id="logo">
-        <img src="../assets/logo.png" id="head-logo"/>
+        <img src="http://q7fplcgtx.bkt.clouddn.com/image/logo.png" id="head-logo" />
         <span id="head-msg">消息</span>
       </div>
       <i class="iconfont icon-icon_copyto" id="write" @click="showWrite()"></i>
     </div>
     <more-bar :obj="{more:this.more,morebar:this.morebar,mask:this.mask}"></more-bar>
-    <new-gaga></new-gaga>
+    <new-gaga :relayData="relayData"></new-gaga>
     <div class="mask" @click="closeMask()"></div>
   </div>
 </template>
@@ -24,7 +24,6 @@ export default {
       mask: "",
       newgaga: "",
       home: "",
-      closeM: this.closeMask
     };
   },
   mounted() {
@@ -40,6 +39,22 @@ export default {
       this.newgaga.style.animation = "show-write 0.4s ease";
       this.newgaga.style.display = "block";
       this.home.style.transform = "translateX(-100px)";
+      if (window.history && window.history.pushState) {
+        history.pushState(null, null, document.URL);
+        window.addEventListener("popstate", this.closeWrite, false);
+      }
+    },
+    closeWrite() {
+      window.removeEventListener("popstate", this.closeWrite, false);
+      this.home.style.transform = "translateX(0)";
+      this.newgaga.style.left = "100vw";
+      this.newgaga.style.animation = "close-write 0.4s ease";
+      this.newgaga.addEventListener("webkitAnimationEnd", setWriteNone);
+      var t = this;
+      function setWriteNone() {
+        t.newgaga.style.display = "none";
+        t.newgaga.removeEventListener("webkitAnimationEnd", setWriteNone);
+      }
     },
     showMore() {
       if (
@@ -54,9 +69,14 @@ export default {
         this.morebar.style.animation = "show-morebar 0.4s ease";
         this.mask.style.display = "block";
         this.mask.style.animation = "show-morebar-mask 0.4s linear";
+        if (window.history && window.history.pushState) {
+          history.pushState(null, null, document.URL);
+          window.addEventListener("popstate", this.closeMask, false);
+        }
       }
     },
     closeMask() {
+      window.removeEventListener("popstate", this.closeMask, false);
       this.more.style.transform = "rotate(0)";
       this.more.style.animation = "rotate90to0 0.4s ease";
       this.morebar.style.left = "-300px";
@@ -76,6 +96,14 @@ export default {
   components: {
     moreBar,
     newGaga
+  },
+  props: {
+    relayData: { default: "" }
+  },
+  watch: {
+    relayData() {
+      this.showWrite();
+    }
   }
 };
 </script>
@@ -109,19 +137,20 @@ export default {
   overflow: hidden;
   border-radius: 4px;
 }
- #logo>img, #logo>span{
-   flex: none;
-   display: block;
-   width: 64px;
-   height: 40px;
-   transition: all 0.3s;
- }
- #logo>span{
-   font-weight: bold;
-   font-size: 18px;
-   line-height: 40px;
-   letter-spacing: 2px;
- }
+#logo > img,
+#logo > span {
+  flex: none;
+  display: block;
+  width: 64px;
+  height: 40px;
+  transition: all 0.3s;
+}
+#logo > span {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 40px;
+  letter-spacing: 2px;
+}
 .icon-caidan-kuai,
 .icon-icon_copyto {
   line-height: 50px;
